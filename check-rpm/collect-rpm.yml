@@ -1,0 +1,44 @@
+---
+- name: collect rpm 
+  hosts: undercloud-all
+  remote_user: vcpdevops
+
+#--------------------------------------------------------------
+##
+## 1. Post debug message
+##
+## 2. Copy check_rpm.sh to remote server 
+## 
+## 3. Execute check_rpm.sh
+##
+## 4. Copy the result file back
+##
+## 5. update openstack.log file
+##
+##--------------------------------------------------------------
+    
+  tasks:
+
+    - debug: msg="System {{ inventory_hostname }} cluster name {{ clustername }}"
+
+    - name: Copy check_rpm.sh to remote server
+      copy:
+        src: /home/report01/dashboard/check_rpm.sh
+        dest: /home/vcpdevops/src/
+        owner: vcpdevops
+        group: vcpdevops
+        mode: u=rwx,g=r,o=r 
+
+    - name: Execute check_rpm.sh
+      shell: /home/vcpdevops/src/check_rpm.sh
+      args:
+         executable: /bin/bash         
+      
+    # Note if file content identical, it will not copy
+    - name: Copy log file to server
+      fetch: src=/tmp/rpm_result.txt
+            dest=/var/www/html/dashboard/{{ clustername }}/rpm_results.txt
+            flat=yes
+
+    - name: update log file
+      local_action: shell /home/report01/dashboard/openstackLogger {{ clustername }}
