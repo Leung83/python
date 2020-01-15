@@ -12,7 +12,7 @@ options.add_argument('--incognito')
 options.add_argument('--headless')
 driver = webdriver.Firefox(options=options)
 
-driver.get("https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/k7/")
+driver.get("https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/marieviks-udde/")
 time.sleep(2)
 
 # Print all ids on page, used for developing
@@ -29,4 +29,4 @@ else:
         print 'Send mail'
         # Need to have postfix configured with Gmail 
         # https://www.linode.com/docs/email/postfix/configure-postfix-to-send-mail-using-gmail-and-google-apps-on-debian-or-ubuntu/
-        commands.getoutput('echo "https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/k7/" | mail -s "Apartment Status Changed" YOURMAIL@gmail.com')
+        commands.getoutput('echo "https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/marieviks-udde/" | mail -s "Apartment Status Changed" YOURMAIL@gmail.com')
