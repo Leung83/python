@@ -29,4 +29,4 @@ else:
         print 'Send mail'
         # Need to have postfix configured with Gmail 
         # https://www.linode.com/docs/email/postfix/configure-postfix-to-send-mail-using-gmail-and-google-apps-on-debian-or-ubuntu/
-        commands.getoutput('echo "https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/k7/41103" | mail -s "Apartment Status Changed" simonleung83@gmail.com peterleung89@gmail.com')
+        commands.getoutput('echo "https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/k7/41103" | mail -s "Apartment Status Changed" YOURMAIL@gmail.com')
