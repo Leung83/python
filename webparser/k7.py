@@ -12,7 +12,7 @@ options.add_argument('--incognito')
 options.add_argument('--headless')
 driver = webdriver.Firefox(options=options)
 
-driver.get("https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/k7/41103")
+driver.get("https://www.jm.se/stockholm-lan/stockholm-kommun/liljeholmskajen/k7/")
 time.sleep(2)
 
 # Print all ids on page, used for developing
