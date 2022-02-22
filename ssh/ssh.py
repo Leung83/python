@@ -3,13 +3,13 @@
 """
 Created by:			Simon Leung
 Email:  			simonleung83@gmail.com
-Python version:		2.7
+Python version:		        2.7
 Date:				2017-12-13
 """
 
 
 import sys			# Module to get CLI arguments
-import paramiko		# Module to SSH
+import paramiko		        # Module to SSH
 import sys			# Module to parse CLI arguments
 
 """ 
