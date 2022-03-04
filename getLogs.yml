@@ -1,0 +1,119 @@
+# Created by:		Simon Leung
+# Version:		  2020-04-28
+---
+
+- name: Collect logs on vSPC VMs 
+  hosts: [vspc_vwifi_bbnj ,vspc_vwifi_sltx,vspc_vcommon_bbnj,vspc_vcommon_sltx]
+  gather_facts: no
+
+  tasks:  
+    - name: Create VM log folder if it doesn't exist
+      connection: local    
+      file:
+        path: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}
+        state: directory
+  
+    - name: Find SPC log files /var/opt/SIU/log/
+      find:
+        paths: /var/opt/SIU/log/
+        patterns: '*.log'
+        file_type: file
+      register: logfiles
+      when: all_logs == "false"
+      
+    - name: Find SPC ALL log files /var/opt/SIU/log/
+      find:
+        paths: /var/opt/SIU/log/
+        patterns: '*.log*'
+        file_type: file
+      register: all_logfiles
+      when: all_logs == "true"
+
+    #- debug: var=logfiles
+
+    - name: Copy log files to VM log folder, ignore checksum since files updates continuously 
+      fetch: 
+        src: "{{ item.path }}"
+        dest: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}/
+        flat: yes
+        validate_checksum: no
+        fail_on_missing: no
+      with_items: "{{ logfiles.files }}"
+      when: all_logs == "false"
+      
+    - name: Copy ALL log files to VM log folder, ignore checksum since files updates continuously 
+      fetch: 
+        src: "{{ item.path }}"
+        dest: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}/
+        flat: yes
+        validate_checksum: no
+        fail_on_missing: no
+      with_items: "{{ all_logfiles.files }}"
+      when: all_logs == "true"    
+
+    - name: Find CIS logs
+      find:
+        paths: /var/opt/SIU/cis/logs,/var/opt/SIU/webappserver/logs
+        patterns: 'cis.log,cis-ui.log'
+        file_type: file
+      when: "'CIS' in inventory_hostname"
+      register: cisfiles  
+      
+    - name: Copy log files to VM log folder, ignore checksum since files updates continuously 
+      fetch: 
+        src: "{{ item.path }}"
+        dest: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}/
+        flat: yes
+        validate_checksum: no
+        fail_on_missing: no
+      with_items: "{{ cisfiles.files }}"
+      when: "'CIS' in inventory_hostname"        
+
+    - name: Find EMS logs
+      find:
+        paths: /var/opt/SIU/webappserver/logs
+        patterns: 'web-console.log'
+        file_type: file
+      when: "'EMS' in inventory_hostname"
+      register: emsfiles        
+      
+    - name: Copy log files to VM log folder, ignore checksum since files updates continuously 
+      fetch: 
+        src: "{{ item.path }}"
+        dest: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}/
+        flat: yes
+        validate_checksum: no
+        fail_on_missing: no
+      with_items: "{{ emsfiles.files }}"
+      when: "'EMS' in inventory_hostname"         
+      
+    - name: Find TLS NRB/ASP GUI logs
+      find:
+        paths: /opt/NRBGUI/tomcat/logs/,/opt/ASPGUI/tomcat/logs/
+        patterns: 'nrb.log*,asp.log'
+        file_type: file
+      when: "'TLS' in inventory_hostname"
+      register: tlsfiles      
+      
+    - name: Copy log files to VM log folder, ignore checksum since files updates continuously 
+      fetch: 
+        src: "{{ item.path }}"
+        dest: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}/
+        flat: yes
+        validate_checksum: no
+        fail_on_missing: no
+      with_items: "{{ tlsfiles.files }}"
+      when: "'TLS' in inventory_hostname"      
+
+    - name: Zip log folders
+      connection: local
+      archive: 
+        path: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}/*
+        dest: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}.zip       
+        format: zip  
+
+    - name: Remove log folders, since we have the zipped files
+      connection: local
+      file:
+        path: /home/vtools/SPCjumpserver/scripts/getLogs/{{ inventory_hostname }}
+        state: absent
